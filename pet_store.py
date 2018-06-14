@@ -17,12 +17,12 @@ class Animal(object):
         health: A integer between 70-100, the health of the animal
     """
 
-    def __init__(self, name, type):
+    def __init__(self, name, type, pet_health=random.randint(70, 100)):
         """initialize Animal with given arguments"""
         self.name = name
         self.type = type
         self.is_pet = type in PET_TYPE
-        self.health = random.randint(70, 100)
+        self.health = pet_health
 
     def shout(self):
         """the animal talks depends on its type."""
@@ -43,9 +43,16 @@ class Store(object):
         customer_pet: A dictionary, keys(string): customer names, 
             values(Animal class instance): pets stored by the customer
     """
-    def __init__(self):
+    def __init__(self, f):
         """initialize Store"""
         self.customer_pet = {}
+
+        f.seek(0)
+        lines = list(f)
+        for line in lines:
+            customer_name, pet_name, pet_type, pet_health = line.split()
+            animal_to_store = Animal(pet_name, pet_type, pet_health)
+            self.store_pet(customer_name, animal_to_store)
 
     def store_pet(self, customer, animal):
         """storing a pet for a customer, a customer may have many pets
@@ -86,16 +93,9 @@ class Store(object):
 def main():
     """store or check pets for a customer"""
 
-    # read the file "store_info.txt" and initialize the store
-    my_store = Store()
-
+    # initialize the store
     f = open("store_info.txt", "a+")
-    f.seek(0)
-    lines = list(f)
-    for line in lines:
-        customer_name, pet_name, pet_type = line.split()
-        animal_to_store = Animal(pet_name, pet_type)
-        my_store.store_pet(customer_name, animal_to_store)
+    my_store = Store(f)
 
     # parsing command line argument
     parser = argparse.ArgumentParser()
@@ -116,7 +116,8 @@ def main():
 
         # store succeeded
         if my_store.store_pet(customer_name, animal_to_store):
-            f.write(customer_name + " " + pet_name + " " + pet_type + "\n")
+            f.write(customer_name + " " + pet_name + " " + pet_type + " " +
+                    str(animal_to_store.health) + "\n")
             print("store completed, customer: " + customer_name + ", pet name: "
                   + pet_name + ", type: " + pet_type)
         # store failed
