@@ -11,8 +11,8 @@ class Animal(object):
     """The class of Animal, all living creatures belong to here.
 
     Attributes:
-        name: A string of the name of a animal
-        type: A string of the type of a animal
+        name: A string of the name of an animal
+        type: A string of the type of an animal
         is_pet: A boolean indicating whether the animal is a pet
         health: A integer between 70-100, the health of the animal
     """
