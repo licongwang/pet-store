@@ -49,28 +49,30 @@ class Store(object):
             for pet in self.customer_pet[customer]:
                 print("pet name: " + pet.name + ", type: " + pet.type + ", health: " + str(pet.health))
 
-my_store = Store()
 
-# parsing command line argument
-parser = argparse.ArgumentParser()
-parser.add_argument("customer_name", help="name of the customer, assume unique")
-parser.add_argument("action", help="action to perform, e.g. 'store', 'check'")
-parser.add_argument("pet_name", nargs='?', help="name of the pet")
-parser.add_argument("pet_type", nargs='?', help="type of the pet")
-args = parser.parse_args()
+def main():
+    my_store = Store()
 
-customer_name = args.customer_name
+    # parsing command line argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument("customer_name", help="name of the customer, assume unique")
+    parser.add_argument("action", help="action to perform, e.g. 'store', 'check'")
+    parser.add_argument("pet_name", nargs='?', help="name of the pet")
+    parser.add_argument("pet_type", nargs='?', help="type of the pet")
+    args = parser.parse_args()
 
-# manually stored pet to test "check"
-myPet = Animal("frog", "Dog")
-my_store.customer_pet[customer_name] = [myPet]
+    customer_name = args.customer_name
 
-# perform command line action
-if args.action == "store":
-    animal_to_store = Animal(args.pet_name, args.pet_type)
-    my_store.store_pet(customer_name, animal_to_store)
-elif args.action == "check":
-    my_store.check_pet(customer_name)
-else:
-    print("invalid action: " + args.action)
+    # perform command line action
+    if args.action == "store":
+        animal_to_store = Animal(args.pet_name, args.pet_type)
+        my_store.store_pet(customer_name, animal_to_store)
+    elif args.action == "check":
+        my_store.check_pet(customer_name)
+    else:
+        print("invalid action: " + args.action)
+
+
+if __name__ == "__main__":
+    main()
 
