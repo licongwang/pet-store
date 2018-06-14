@@ -43,16 +43,17 @@ class Store(object):
         customer_pet: A dictionary, keys(string): customer names, 
             values(Animal class instance): pets stored by the customer
     """
-    def __init__(self, f):
-        """initialize Store"""
+    def __init__(self):
+        """initializes Store, opens store_info.txt for initial pets"""
         self.customer_pet = {}
 
-        f.seek(0)
-        lines = list(f)
+        self.f = open("store_info.txt", "a+")
+        self.f.seek(0)
+        lines = list(self.f)
         for line in lines:
-            customer_name, pet_name, pet_type, pet_health = line.split()
+            customer, pet_name, pet_type, pet_health = line.split()
             animal_to_store = Animal(pet_name, pet_type, pet_health)
-            self.store_pet(customer_name, animal_to_store)
+            self.store_pet(customer, animal_to_store)
 
     def store_pet(self, customer, animal):
         """storing a pet for a customer, a customer may have many pets
@@ -75,61 +76,83 @@ class Store(object):
 
     def check_pet(self, customer):
         """allows a customer to check his/her pets stored
+        
         Args:
             customer: A string indicating the customer's name.
         
-        Outputs:
-            A list of all pets owned by the customer, or a message 
-            indicating the customer did not store any pets
+        Returns:
+            A list of all pets owned by the customer, or an empty
+            list if the customer haven't stored any pets
         """
         if customer not in self.customer_pet:
-            print(customer + " doesn't have pets stored")
+            return []
         else:
-            print(customer + " has:")
-            for pet in self.customer_pet[customer]:
-                print("pet name: " + pet.name + ", type: " + pet.type + ", health: " + str(pet.health))
+            return self.customer_pet[customer]
+
+    def handle_action(self, customer, pet_name, pet_type, action):
+        """perform an action based on the given arguments, may call
+           store_pet() or check_pet()
+        
+        Args:
+            customer: A string indicating the customer's name.
+            pet_name: A string of the name of an animal
+            pet_type: A string of the type of an animal
+            action: the action to perform, "store" or "check"
+
+        Outputs:
+            A message indicating the result of the the store 
+            or check action
+        """
+
+        # perform command line action
+        if action == "store":
+            animal_to_store = Animal(pet_name, pet_type)
+
+            # store succeeded
+            if self.store_pet(customer, animal_to_store):
+                self.f.write(customer + " " + pet_name + " " + pet_type + " " +
+                             str(animal_to_store.health) + "\n")
+                print("store completed, customer: " + customer + ", pet name: " +
+                      pet_name + ", type: " + pet_type)
+            # store failed
+            else:
+                print("store failed, only a pet can be stored, " + pet_type + " is not a pet")
+
+        elif action == "check":
+            pet_list = self.check_pet(customer)
+            if pet_list:
+                print(customer + " has:")
+                for pet in pet_list:
+                    print("pet name: " + pet.name + ", type: " + pet.type + ", health: " + str(pet.health))
+            else:
+                print(customer + " doesn't have pets stored")
+
+        else:
+            print("invalid action: " + action)
+
+        self.f.close()
 
 
 def main():
     """store or check pets for a customer"""
 
     # initialize the store
-    f = open("store_info.txt", "a+")
-    my_store = Store(f)
+    my_store = Store()
 
     # parsing command line argument
     parser = argparse.ArgumentParser()
-    parser.add_argument("customer_name", help="name of the customer, assume unique")
+    parser.add_argument("customer", help="name of the customer, assume unique")
     parser.add_argument("action", help="action to perform, e.g. 'store', 'check'")
     parser.add_argument("pet_name", nargs='?', help="name of the pet")
     parser.add_argument("pet_type", nargs='?', help="type of the pet")
     args = parser.parse_args()
 
-    customer_name = args.customer_name
+    customer = args.customer
     pet_name = args.pet_name
     pet_type = args.pet_type
     action = args.action
 
-    # perform command line action
-    if action == "store":
-        animal_to_store = Animal(pet_name, pet_type)
-
-        # store succeeded
-        if my_store.store_pet(customer_name, animal_to_store):
-            f.write(customer_name + " " + pet_name + " " + pet_type + " " +
-                    str(animal_to_store.health) + "\n")
-            print("store completed, customer: " + customer_name + ", pet name: "
-                  + pet_name + ", type: " + pet_type)
-        # store failed
-        else:
-            print("store failed, only a pet can be stored, " + pet_type + " is not a pet")
-
-    elif action == "check":
-        my_store.check_pet(customer_name)
-    else:
-        print("invalid action: " + action)
-
-    f.close()
+    my_store.handle_action(customer, pet_name, pet_type, action)
 
 if __name__ == "__main__":
     main()
