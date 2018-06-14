@@ -1,6 +1,7 @@
 """ this program runs a simulation of a pet store, 
     allowing customers to store their pets
 """
+import argparse
 
 pet_type = ["Dog", "Cat"]
 
@@ -47,8 +48,27 @@ class Store(object):
                 print("pet name: " + pet.name + ", type: " + pet.type)
 
 my_store = Store()
-my_pet = Animal("frog", "Dog")
-my_animal = Animal("piggy", "Horse")
-my_store.store_pet("licong", my_pet)
-my_store.store_pet("licong", my_animal)
+
+# parsing command line argument
+parser = argparse.ArgumentParser()
+parser.add_argument("customer_name", help="name of the customer, assume unique")
+parser.add_argument("action", help="action to perform, e.g. 'store', 'check'")
+parser.add_argument("pet_name", nargs='?', help="name of the pet")
+parser.add_argument("pet_type", nargs='?', help="type of the pet")
+args = parser.parse_args()
+
+customer_name = args.customer_name
+
+# manually stored pet to test "check"
+myPet = Animal("frog", "Dog")
+my_store.customer_pet[customer_name] = [myPet]
+
+# perform command line action
+if args.action == "store":
+    animal_to_store = Animal(args.pet_name, args.pet_type)
+    my_store.store_pet(customer_name, animal_to_store)
+elif args.action == "check":
+    my_store.check_pet(customer_name)
+else:
+    print("invalid action: " + args.action)
 
