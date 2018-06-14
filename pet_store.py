@@ -21,7 +21,7 @@ class Animal(object):
         """initialize Animal with given arguments"""
         self.name = name
         self.type = type
-        self.is_pet = type in pet_type
+        self.is_pet = type in PET_TYPE
         self.health = random.randint(70, 100)
 
     def shout(self):
