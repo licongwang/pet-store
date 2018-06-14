@@ -12,7 +12,7 @@ class Animal(object):
         self.name = name
         self.type = type
         self.is_pet = type in pet_type
-        self.health = random.randint(80, 100)
+        self.health = random.randint(70, 100)
 
     def shout(self):
         if self.type == "Cat":
