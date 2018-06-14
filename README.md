@@ -1,1 +1,1 @@
-This is a testing project, a simulation of a pet store.git
+This is a testing project, a simulation of a pet store
