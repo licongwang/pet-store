@@ -2,6 +2,7 @@
     allowing customers to store their pets
 """
 import argparse
+import random
 
 pet_type = ["Dog", "Cat"]
 
@@ -11,6 +12,7 @@ class Animal(object):
         self.name = name
         self.type = type
         self.is_pet = type in pet_type
+        self.health = random.randint(80, 100)
 
     def shout(self):
         if self.type == "Cat":
@@ -45,7 +47,7 @@ class Store(object):
         else:
             print(customer + " has:")
             for pet in self.customer_pet[customer]:
-                print("pet name: " + pet.name + ", type: " + pet.type)
+                print("pet name: " + pet.name + ", type: " + pet.type + ", health: " + str(pet.health))
 
 my_store = Store()
 
