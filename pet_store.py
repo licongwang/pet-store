@@ -21,7 +21,7 @@ class Animal(object):
         """initialize Animal with given arguments"""
         self.name = name
         self.type = type
-        self.is_pet = type in pet_type
+        self.is_pet = type in PET_TYPE
         self.health = random.randint(70, 100)
 
     def shout(self):
@@ -54,18 +54,17 @@ class Store(object):
             customer: A string indicating the customer's name.
             animal: An Animal class instance which is to be stored
         
-        Outputs:
-            Success or failure message depending on whether the given 
-            animal is a pet, since only pets can be stored.
+        Returns:
+            True or False depending on whether the given 
+            animal is a pet.
         """
         if not animal.is_pet:
-            print("store failed, only a pet can be stored, " + animal.type + " is not a pet")
+            return False
         else:
             if customer not in self.customer_pet:
                 self.customer_pet[customer] = []
             self.customer_pet[customer] += [animal]
-
-            print("store completed, customer: " + customer + ", pet Name: " + animal.name + ", type: " + animal.type)
+            return True
 
     def check_pet(self, customer):
         """allows a customer to check his/her pets stored
@@ -85,7 +84,18 @@ class Store(object):
 
 
 def main():
+    """store or check pets for a customer"""
+
+    # read the file "store_info.txt" and initialize the store
     my_store = Store()
+
+    f = open("store_info.txt", "a+")
+    f.seek(0)
+    lines = list(f)
+    for line in lines:
+        customer_name, pet_name, pet_type = line.split()
+        animal_to_store = Animal(pet_name, pet_type)
+        my_store.store_pet(customer_name, animal_to_store)
 
     # parsing command line argument
     parser = argparse.ArgumentParser()
@@ -96,16 +106,29 @@ def main():
     args = parser.parse_args()
 
     customer_name = args.customer_name
+    pet_name = args.pet_name
+    pet_type = args.pet_type
+    action = args.action
 
     # perform command line action
-    if args.action == "store":
-        animal_to_store = Animal(args.pet_name, args.pet_type)
-        my_store.store_pet(customer_name, animal_to_store)
-    elif args.action == "check":
+    if action == "store":
+        animal_to_store = Animal(pet_name, pet_type)
+
+        # store succeeded
+        if my_store.store_pet(customer_name, animal_to_store):
+            f.write(customer_name + " " + pet_name + " " + pet_type + "\n")
+            print("store completed, customer: " + customer_name + ", pet name: "
+                  + pet_name + ", type: " + pet_type)
+        # store failed
+        else:
+            print("store failed, only a pet can be stored, " + pet_type + " is not a pet")
+
+    elif action == "check":
         my_store.check_pet(customer_name)
     else:
-        print("invalid action: " + args.action)
+        print("invalid action: " + action)
 
+    f.close()
 
 if __name__ == "__main__":
     main()
