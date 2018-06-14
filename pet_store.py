@@ -84,6 +84,8 @@ class Store(object):
 
 
 def main():
+    """store or check pets for a customer"""
+
     # read the file "store_info.txt" and initialize the store
     my_store = Store()
 
